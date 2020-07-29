@@ -101,6 +101,7 @@ func (i *fdDir) IterDirents(ctx context.Context, cb vfs.IterDirentsCallback, off
 //
 // +stateify savable
 type fdDirInode struct {
+	implStatFS
 	kernfs.InodeNotSymlink
 	kernfs.InodeDirectoryNoNewChildren
 	kernfs.InodeAttrs
@@ -179,6 +180,7 @@ func (i *fdDirInode) CheckPermissions(ctx context.Context, creds *auth.Credentia
 //
 // +stateify savable
 type fdSymlink struct {
+	implStatFS
 	kernfs.InodeAttrs
 	kernfs.InodeNoopRefCount
 	kernfs.InodeSymlink
@@ -227,6 +229,7 @@ func (s *fdSymlink) Getlink(ctx context.Context, mnt *vfs.Mount) (vfs.VirtualDen
 //
 // +stateify savable
 type fdInfoDirInode struct {
+	implStatFS
 	kernfs.InodeNotSymlink
 	kernfs.InodeDirectoryNoNewChildren
 	kernfs.InodeAttrs

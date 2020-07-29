@@ -199,9 +199,9 @@ func (fs *filesystem) Release(ctx context.Context) {
 // inode implements kernfs.Inode.
 type inode struct {
 	kernfs.InodeAttrs
+	kernfs.InodeDirectoryNoNewChildren
 	kernfs.InodeNoDynamicLookup
 	kernfs.InodeNotSymlink
-	kernfs.InodeDirectoryNoNewChildren
 	kernfs.OrderedChildren
 
 	locks vfs.FileLocks
@@ -323,4 +323,10 @@ func (i *inode) Stat(ctx context.Context, fs *vfs.Filesystem, opts vfs.StatOptio
 	}
 
 	return statFromFUSEAttr(out.Attr, opts.Mask, fusefs.devMinor), nil
+}
+
+// StatFS implements kernfs.Inode.StatFS.
+func (i *inode) StatFS(ctx context.Context, fs *vfs.Filesystem) (linux.Statfs, error) {
+	// TODO(gvisor.dev/issues/3413): Complete the implementation of statfs.
+	return vfs.GenericStatFS(linux.FUSE_SUPER_MAGIC), nil
 }

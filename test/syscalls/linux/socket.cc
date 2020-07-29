@@ -12,8 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <linux/magic.h>
 #include <sys/socket.h>
 #include <sys/stat.h>
+#include <sys/statfs.h>
 #include <sys/types.h>
 #include <unistd.h>
 
@@ -92,6 +94,19 @@ TEST(SocketTest, UnixSocketStat) {
     EXPECT_EQ(statbuf.st_atime, statbuf.st_mtime);
     EXPECT_EQ(statbuf.st_atime, statbuf.st_ctime);
   }
+}
+
+TEST(SocketTest, UnixSocketStatFS) {
+  SKIP_IF(IsRunningWithVFS1());
+
+  FileDescriptor bound =
+      ASSERT_NO_ERRNO_AND_VALUE(Socket(AF_UNIX, SOCK_STREAM, PF_UNIX));
+
+  struct statfs st;
+  EXPECT_THAT(fstatfs(bound.get(), &st), SyscallSucceeds());
+  EXPECT_EQ(st.f_type, SOCKFS_MAGIC);
+  EXPECT_EQ(st.f_bsize, getpagesize());
+  EXPECT_EQ(st.f_namelen, NAME_MAX);
 }
 
 using SocketOpenTest = ::testing::TestWithParam<int>;

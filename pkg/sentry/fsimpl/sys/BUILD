@@ -1,16 +1,31 @@
 load("//tools:defs.bzl", "go_library", "go_test")
+load("//tools/go_generics:defs.bzl", "go_template_instance")
 
 licenses(["notice"])
+
+go_template_instance(
+    name = "dir_refs",
+    out = "dir_refs.go",
+    package = "sys",
+    prefix = "dir",
+    template = "//pkg/refs_vfs2:refs_template",
+    types = {
+        "T": "dir",
+    },
+)
 
 go_library(
     name = "sys",
     srcs = [
+        "dir_refs.go",
         "sys.go",
     ],
     visibility = ["//pkg/sentry:internal"],
     deps = [
         "//pkg/abi/linux",
         "//pkg/context",
+        "//pkg/log",
+        "//pkg/refs",
         "//pkg/sentry/fsimpl/kernfs",
         "//pkg/sentry/kernel",
         "//pkg/sentry/kernel/auth",

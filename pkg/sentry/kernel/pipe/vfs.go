@@ -247,6 +247,10 @@ func (fd *VFSPipeFD) SetPipeSize(size int64) (int64, error) {
 // IOSequence returns a useremm.IOSequence that reads up to count bytes from,
 // or writes up to count bytes to, fd.
 func (fd *VFSPipeFD) IOSequence(count int64) usermem.IOSequence {
+	v := fd.pipe.queued()
+	if v < count {
+		count = v
+	}
 	return usermem.IOSequence{
 		IO:    fd,
 		Addrs: usermem.AddrRangeSeqOf(usermem.AddrRange{0, usermem.Addr(count)}),
